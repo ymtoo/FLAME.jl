@@ -3,7 +3,6 @@ module FLAME
 using Clustering: display_level
 using Distances
 using NearestNeighbors
-using NearestNeighbors: copy_svec
 using Printf
 
 export
