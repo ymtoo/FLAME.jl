@@ -31,7 +31,7 @@ end
 """
 K-nearest neighbors without the querying points.
 """
-function NearestNeighbors.knn(data::AbstractVecOrMat{T}, k::Integer=3; metric::M=Euclidean()) where {T<:AbstractFloat,M<:Metric}
+function NearestNeighbors.knn(data::AbstractMatrix{T}, k::Int=3; metric::M=Euclidean()) where {T,M<:Metric}
     tree = BruteTree(data, metric)
     idxs, dists = knn(tree, data, k+1, true)
     [idx[2:end] for idx in idxs], [dist[2:end] for dist in dists]
@@ -62,7 +62,7 @@ end
 """
 Initialize fuzzy memberships.
 """
-function initializemembership(numdata::Integer, csos::OT, outliers::OT, rests::OT) where OT<:AbstractVector
+function initializemembership(numdata::Int, csos::OT, outliers::OT, rests::OT) where OT<:AbstractVector
     numcsos = length(csos)
     memberships = zeros(numdata, numcsos+1)
     fixed = ones(numcsos+1) ./ (numcsos+1)
@@ -99,13 +99,13 @@ Fuzzy clustering by Local Approximation of MEmbership (FLAME).
 
 Fu, L., Medico, E. FLAME, a novel fuzzy clustering method for the analysis of DNA microarray data. BMC Bioinformatics 8, 3 (2007).
 """
-function flame(data::AbstractVecOrMat{T}, 
+function flame(data::AbstractMatrix{T}, 
                k::Integer; 
                metric::M=Euclidean(), 
                threshold::T=2.0, 
                maxiter::Integer=_flame_default_maxiter, 
                tol::T=_flame_default_tol,
-               display::Symbol=_flame_default_display) where {T<:AbstractFloat,M<:Metric}
+               display::Symbol=_flame_default_display) where {T<:Real,M<:Metric}
     numdata = size(data,2)
     idxs, dists = knn(data, k; metric=metric)
     csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
