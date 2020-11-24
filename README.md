@@ -1,4 +1,6 @@
 # FLAME
+![CI](https://github.com/ymtoo/FLAME.jl/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/ymtoo/FLAME.jl/branch/master/graph/badge.svg?token=8JYIR0IKGZ)](https://codecov.io/gh/ymtoo/FLAME.jl)
 
 This package implements [Fuzzy clustering by Local Approximation of MEmberships (FLAME)](https://link.springer.com/article/10.1186/1471-2105-8-3).
 
