@@ -9,6 +9,9 @@ Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
+[compat]
+Clustering = "0.14"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
