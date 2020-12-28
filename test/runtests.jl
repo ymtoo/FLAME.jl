@@ -24,7 +24,8 @@ using Distances, Test
     
     idxs, dists = FLAME._knn(data, k; algorithm="brute", metric=Euclidean())
     csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
-    memberships = initializemembership(numdata, csos, outliers, rests)
+    memberships = zeros(numdata, length(csos)+1)
+    initializemembership!(memberships, csos, outliers, rests)
     numdata = size(data,2)
     numcsos = length(csos)
     for cso in csos

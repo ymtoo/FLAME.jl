@@ -9,7 +9,7 @@ export
 
     FLAMEResult,
     extractstructure, 
-    initializemembership, 
+    initializemembership!, 
     distances2similarities,
     flame
 
@@ -78,9 +78,10 @@ end
 """
 Initialize fuzzy memberships.
 """
-function initializemembership(numdata::Int, csos::OT, outliers::OT, rests::OT) where OT<:AbstractVector
+function initializemembership!(memberships::AbstractMatrix{PT}, csos::OT, outliers::OT, rests::OT) where {PT,OT<:AbstractVector}
+    numdata = size(memberships, 1)
     numcsos = length(csos)
-    memberships = zeros(numdata, numcsos+1)
+    #memberships = zeros(numdata, numcsos+1)
     fixed = ones(numcsos+1) ./ (numcsos+1)
     for i in 1:numdata
         if i in csos
@@ -119,14 +120,15 @@ function flame(data::AbstractMatrix{T},
                k::Integer; 
                algorithm::String="brute", 
                metric::MT=Euclidean(),
-               threshold::T=2.0, 
+               threshold::PT=2.0, 
                maxiter::Integer=_flame_default_maxiter, 
-               tol::T=_flame_default_tol,
-               display::Symbol=_flame_default_display) where {T<:Real,MT}
+               tol::PT=_flame_default_tol,
+               display::Symbol=_flame_default_display) where {T<:Real,MT,PT}
     numdata = size(data,2)
     idxs, dists = _knn(data, k; algorithm=algorithm, metric=metric)
     csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
-    memberships = initializemembership(numdata, csos, outliers, rests)
+    memberships = zeros(PT, numdata, length(csos)+1)
+    memberships = initializemembership!(memberships, csos, outliers, rests)
     displevel = display_level(display)
     prev_objv = δ = typemax(T)
     iter = 0
