@@ -22,7 +22,7 @@ scatter(data[1,:], data[2,:]; color=:gray, legend=false, markeralpha=0.5)
 ```julia
 k = 100
 threshold = 2.0
-idxs, dists = knn(data, k)
+idxs, dists = FLAME._knn(data, k)
 csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
 
 p = plot()
