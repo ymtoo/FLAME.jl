@@ -29,6 +29,8 @@ struct FLAMEResult{T<:AbstractFloat,OT<:Integer}
 end
 
 """
+    gettree(data, algorithm, metric)
+
 Create a tree from `data` using the given `metric`.
 """
 function gettree(data, algorithm, metric)
@@ -44,6 +46,8 @@ function gettree(data, algorithm, metric)
 end
 
 """
+    _knn(data, k; algorithm="brute", metric=Euclidean())
+
 K-nearest neighbors without the querying points.
 """
 function _knn(data::AbstractMatrix{T}, k::Int; algorithm::String="brute", metric::MT=Euclidean()) where {T,MT}
@@ -53,6 +57,8 @@ function _knn(data::AbstractMatrix{T}, k::Int; algorithm::String="brute", metric
 end
 
 """
+    extractstructure(idxs, dists, threshold)
+
 Extract structure information from the data.
 """
 function extractstructure(idxs::AbstractVector{IVT}, 
@@ -77,6 +83,8 @@ function extractstructure(idxs::AbstractVector{IVT},
 end
 
 """
+    initializemembership!(memberships, csos, outliers, rests)
+
 Initialize fuzzy memberships.
 """
 function initializemembership!(memberships::AbstractMatrix{PT}, csos::OT, outliers::OT, rests::OT) where {PT,OT<:AbstractVector}
@@ -99,6 +107,8 @@ function initializemembership!(memberships::AbstractMatrix{PT}, csos::OT, outlie
 end
 
 """
+    distances2similarities(ds)
+
 Transform distances to similarities.
 """
 function distances2similarities(ds::AbstractVector{T}) where T<:AbstractFloat
@@ -113,8 +123,28 @@ function update_memberships(ps::AbstractMatrix{T}, ds) where T<:AbstractFloat
 end
 
 """
+    flame(data, 
+          k; 
+          algorithm="brute", 
+          metric=Euclidean(), 
+          threshold=2.0, 
+          maxiter=_flame_default_maxiter,
+          tol=_flame_default_tol,
+          display=_flame_default_display)
+
 Fuzzy clustering by Local Approximation of MEmbership (FLAME).
 
+# Arguments:
+- `data`: 2-D array of which each column is a data point
+- `k`: number of neighbors
+- `algorithm`: k-nearest neighbors algorithm ("brute", "kd", "ball")
+- `metric`: distance metric between data points
+- `threshold`: data points with a density below the threshold are defined as possible outliers
+- `maxiter`: maximum number of iterations
+- `tol`: minimal allowed change of the objective during convergence
+- `display`: the level of information to be displayed 
+
+# Reference:
 Fu, L., Medico, E. FLAME, a novel fuzzy clustering method for the analysis of DNA microarray data. BMC Bioinformatics 8, 3 (2007).
 """
 function flame(data::AbstractMatrix{T}, 
@@ -166,6 +196,8 @@ function flame(data::AbstractMatrix{T},
 end
 
 """
+    construct_clusters(result)
+
 Get cluster assignment vectors based on the highest membership score.
 """
 function construct_clusters(result::FLAMEResult)
