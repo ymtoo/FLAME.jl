@@ -9,7 +9,6 @@ export
 
     FLAMEResult,
     extractstructure, 
-    knn, 
     initializemembership, 
     distances2similarities,
     flame
@@ -29,10 +28,25 @@ struct FLAMEResult{T<:AbstractFloat,OT<:Integer}
 end
 
 """
+Create a tree from `data` using the given `metric`.
+"""
+function gettree(data, algorithm, metric)
+    if algorithm == "brute"
+        BruteTree(data, metric)
+    elseif  algorithm == "kd"
+        KDTree(data, metric)
+    elseif algorithm == "ball"
+        BallTree(data, metric)
+    else
+        throw(ArgumentError("Invalid algorithm."))
+    end
+end
+
+"""
 K-nearest neighbors without the querying points.
 """
-function NearestNeighbors.knn(data::AbstractMatrix{T}, k::Int=3; metric::M=Euclidean()) where {T,M<:Metric}
-    tree = BruteTree(data, metric)
+function _knn(data::AbstractMatrix{T}, k::Int; algorithm::String="brute", metric::MT=Euclidean()) where {T,MT}
+    tree = gettree(data, algorithm, metric)
     idxs, dists = knn(tree, data, k+1, true)
     [idx[2:end] for idx in idxs], [dist[2:end] for dist in dists]
 end
@@ -40,7 +54,9 @@ end
 """
 Extract structure information from the data.
 """
-function extractstructure(idxs::AbstractVector{IVT}, dists::AbstractVector{FVT}; threshold::T) where {IVT,FVT,T<:AbstractFloat}
+function extractstructure(idxs::AbstractVector{IVT}, 
+                          dists::AbstractVector{FVT}; 
+                          threshold::T) where {IVT,FVT,T<:AbstractFloat}
     totaldists = sum.(dists)
     maxdist = maximum(totaldists)
     densities = maxdist ./ totaldists
@@ -101,13 +117,14 @@ Fu, L., Medico, E. FLAME, a novel fuzzy clustering method for the analysis of DN
 """
 function flame(data::AbstractMatrix{T}, 
                k::Integer; 
-               metric::M=Euclidean(), 
+               algorithm::String="brute", 
+               metric::MT=Euclidean(),
                threshold::T=2.0, 
                maxiter::Integer=_flame_default_maxiter, 
                tol::T=_flame_default_tol,
-               display::Symbol=_flame_default_display) where {T<:Real,M<:Metric}
+               display::Symbol=_flame_default_display) where {T<:Real,MT}
     numdata = size(data,2)
-    idxs, dists = knn(data, k; metric=metric)
+    idxs, dists = _knn(data, k; algorithm=algorithm, metric=metric)
     csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
     memberships = initializemembership(numdata, csos, outliers, rests)
     displevel = display_level(display)

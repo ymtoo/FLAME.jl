@@ -1,6 +1,6 @@
 using FLAME
 
-using Test
+using Distances, Test
 
 @testset "FLAME" begin
 
@@ -14,11 +14,16 @@ using Test
 
     k = 100
     threshold = 2.0
-    idxs, dists = knn(data, k)
-    csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
-    @test length(csos) == 2
-    @test outliers == [size(data,2)-1, size(data,2)]
+    for algorithm ∈ ["brute","kd","ball"]
+        idxs, dists = FLAME._knn(data, k; algorithm=algorithm, metric=Euclidean())
+        csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
+        @test length(csos) == 2
+        @test outliers == [size(data,2)-1, size(data,2)]
+    end
+    @test_throws ArgumentError FLAME._knn(data, k; algorithm="test", metric=Euclidean())
     
+    idxs, dists = FLAME._knn(data, k; algorithm="brute", metric=Euclidean())
+    csos, outliers, rests = extractstructure(idxs, dists; threshold=threshold)
     memberships = initializemembership(numdata, csos, outliers, rests)
     numdata = size(data,2)
     numcsos = length(csos)
