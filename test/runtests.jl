@@ -42,11 +42,10 @@ using Distances, Test
     end
 
     res = flame(data, k; threshold=threshold)
-    vs = vec(argmax(res.memberships[rests,1:end-1]; dims=2))
-    labels = [v[2] for v in vs]
-    @test labels == [ones(Int, numdata1-1); 2 * ones(Int, numdata1-1)]
+    @test construct_clusters(res) == [ones(Int, numdata1); 2 .* ones(Int, numdata2); [0,0]]
 
     ds = [0.5,0.1,1.3,1.1]
     sims = distances2similarities(ds)
     @test sims ≈ [0.8333,0.9667,0.5667,0.6333] atol=0.0001
+
 end

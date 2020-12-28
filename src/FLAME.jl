@@ -11,7 +11,8 @@ export
     extractstructure, 
     initializemembership!, 
     distances2similarities,
-    flame
+    flame,
+    construct_clusters
 
 const _flame_default_maxiter = 100
 const _flame_default_tol = 1.0e-6
@@ -162,6 +163,24 @@ function flame(data::AbstractMatrix{T},
     end
 
     FLAMEResult(memberships, csos, outliers, rests, iter, converged)
+end
+
+"""
+Get cluster assignment vectors based on the highest membership score.
+"""
+function construct_clusters(result::FLAMEResult)
+    m = size(result.memberships, 2)
+    indices = argmax(result.memberships; dims=2)
+    xs = Int[]
+    for index ∈ indices
+        ci = last(index.I)
+        if ci != m
+            push!(xs, ci)
+        else
+            push!(xs, 0)
+        end
+    end
+    xs
 end
 
 end # module
